@@ -4,13 +4,14 @@ using UnityEngine;
 
 public class Main : MonoBehaviour
 {
-    // Start is called before the first frame update
+    private GameObject nodePrefab;
+
     void Start()
     {
-        
+        nodePrefab = Resources.Load("Node") as GameObject;
+        Instantiate(nodePrefab);
     }
 
-    // Update is called once per frame
     void Update()
     {
         
