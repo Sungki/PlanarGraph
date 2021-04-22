@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Main : MonoBehaviour
 {
-    [SerializeField] [Range(1,90)] private int TotalNodes = 20;
+    [SerializeField] [Range(1,100)] private int TotalNodes = 20;
     [SerializeField] private float Height = 0;
 
     private int totalGrid = 100;                                                   // 10 x 10
@@ -45,6 +45,8 @@ public class Main : MonoBehaviour
                 i++;
             }
         }
+
+        listPos.Sort();
     }
 
     void Start()
@@ -52,14 +54,14 @@ public class Main : MonoBehaviour
         SetGrid();
         RandomPositionInGrid();
 
-        foreach (int i in listPos)
-            print(i);
+//        foreach (int i in listPos)
+//            print(i);
 
-        print(listPos.Count);
+//        print(listPos.Count);
 
         nodePrefab = Resources.Load("Node") as GameObject;
         for (int i = 1; i <= TotalNodes; i++)
-            listNodes.Add(Instantiate(nodePrefab, grid[i], Quaternion.identity));
+            listNodes.Add(Instantiate(nodePrefab, grid[listPos[i-1]] ,Quaternion.identity));
     }
 
     void Update()
