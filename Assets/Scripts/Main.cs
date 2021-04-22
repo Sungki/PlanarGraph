@@ -54,11 +54,6 @@ public class Main : MonoBehaviour
         SetGrid();
         RandomPositionInGrid();
 
-//        foreach (int i in listPos)
-//            print(i);
-
-//        print(listPos.Count);
-
         nodePrefab = Resources.Load("Node") as GameObject;
         for (int i = 1; i <= TotalNodes; i++)
             listNodes.Add(Instantiate(nodePrefab, grid[listPos[i-1]] ,Quaternion.identity));
