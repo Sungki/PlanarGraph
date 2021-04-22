@@ -4,13 +4,17 @@ using UnityEngine;
 
 public class Main : MonoBehaviour
 {
-    [SerializeField] [Range(1,100)] private int TotalNodes = 20;
+    [SerializeField] [Range(1,60)] private int TotalNodes = 20;
     [SerializeField] private float Height = 0;
 
     private int totalGrid = 100;                                                   // 10 x 10
 
     private GameObject nodePrefab;
+    private GameObject linePrefab;
+
     private List<GameObject> listNodes = new List<GameObject>();
+    private List<GameObject> listLines = new List<GameObject>();
+
     private Dictionary<int, Vector3> grid = new Dictionary<int, Vector3>();
     private List<int> listPos = new List<int>();
 
@@ -57,6 +61,14 @@ public class Main : MonoBehaviour
         nodePrefab = Resources.Load("Node") as GameObject;
         for (int i = 1; i <= TotalNodes; i++)
             listNodes.Add(Instantiate(nodePrefab, grid[listPos[i-1]] ,Quaternion.identity));
+
+        linePrefab = Resources.Load("Line") as GameObject;
+        for (int i = 0; i < TotalNodes - 1; i++)
+        {
+            listLines.Add(Instantiate(linePrefab));
+            listLines[i].GetComponent<Line>().startPos = listNodes[i].transform.position;
+            listLines[i].GetComponent<Line>().endPos = listNodes[i+1].transform.position;
+        }
     }
 
     void Update()
