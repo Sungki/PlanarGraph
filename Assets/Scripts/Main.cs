@@ -5,18 +5,28 @@ using UnityEngine;
 public class Main : MonoBehaviour
 {
     [SerializeField] [Range(1,60)] private int TotalNodes = 20;
-    [SerializeField] private float Height = 0;
+    [SerializeField] private float Height = 0f;
 
     private int totalGrid = 100;                                                   // 10 x 10
 
     private GameObject nodePrefab;
     private GameObject linePrefab;
 
-    private List<GameObject> listNodes = new List<GameObject>();
+    struct Node
+    {
+        public GameObject obj;
+        public bool visited;
+        public Vector3 position;
+    };
+
+    //    private List<GameObject> listNodes = new List<GameObject>();
+
+    private List<Node> listNodes = new List<Node>();
+
     private List<GameObject> listLines = new List<GameObject>();
 
     private Dictionary<int, Vector3> grid = new Dictionary<int, Vector3>();
-    private List<int> listPos = new List<int>();
+    private List<int> gridPos = new List<int>();
 
     void SetGrid()
     {
@@ -39,18 +49,39 @@ public class Main : MonoBehaviour
         {
             int key = Random.Range(1, totalGrid);
 
-            if(listPos.Contains(key))
+            if(gridPos.Contains(key))
             {
                 key = Random.Range(1, totalGrid);
             }
             else
             {
-                listPos.Add(key);
+                gridPos.Add(key);
                 i++;
             }
         }
 
-        listPos.Sort();
+        gridPos.Sort();
+    }
+
+    Vector3 FindClosestNode(List<GameObject> obj, Vector3 pos)
+    {
+        float closestPos = 0f;
+        float distance = 0f;
+        int objIndex = 0;
+
+        closestPos = Vector3.Distance(pos, obj[0].transform.position);
+
+        for(int i = 1; i < obj.Count; i++)
+        {
+            distance = Vector3.Distance(pos, obj[i].transform.position);
+            if(distance < closestPos && pos != obj[i].transform.position)
+            {
+                closestPos = distance;
+                objIndex = i;
+            }
+        }
+
+        return obj[objIndex].transform.position;
     }
 
     void Start()
@@ -60,19 +91,25 @@ public class Main : MonoBehaviour
 
         nodePrefab = Resources.Load("Node") as GameObject;
         for (int i = 1; i <= TotalNodes; i++)
-            listNodes.Add(Instantiate(nodePrefab, grid[listPos[i-1]] ,Quaternion.identity));
+        {
+            Vector3 pos = grid[gridPos[i - 1]];
+
+            Node n = new Node();
+            n.obj = Instantiate(nodePrefab, pos, Quaternion.identity);
+            n.visited = false;
+            n.position = pos;
+            listNodes.Add(n);
+//            listNodes.Add(Instantiate(nodePrefab, grid[listPos[i - 1]], Quaternion.identity));
+        }
 
         linePrefab = Resources.Load("Line") as GameObject;
         for (int i = 0; i < TotalNodes - 1; i++)
         {
             listLines.Add(Instantiate(linePrefab));
-            listLines[i].GetComponent<Line>().startPos = listNodes[i].transform.position;
-            listLines[i].GetComponent<Line>().endPos = listNodes[i+1].transform.position;
-        }
-    }
+            listLines[i].GetComponent<Line>().startPos = listNodes[i].position;
+            listLines[i].GetComponent<Line>().endPos = listNodes[i+1].position;
 
-    void Update()
-    {
-        
+//            listLines[i].GetComponent<Line>().endPos = FindClosestNode(listNodes, listLines[i].GetComponent<Line>().startPos);
+        }
     }
 }
