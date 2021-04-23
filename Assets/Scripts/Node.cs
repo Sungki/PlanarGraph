@@ -12,6 +12,7 @@ public class Node : MonoBehaviour
 
     private void Start()
     {
+        // Particle, Audio and change of colors
         particle = GetComponent<ParticleSystem>();
         audioSource = GetComponent<AudioSource>();
         render = GetComponent<Renderer>();

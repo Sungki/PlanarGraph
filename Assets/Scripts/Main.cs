@@ -4,20 +4,21 @@ using UnityEngine;
 
 public class Main : MonoBehaviour
 {
-    [SerializeField] [Range(1,60)] private int TotalNodes = 20;
-    [SerializeField] private float Height = 0f;
+    [SerializeField] [Range(1,60)] private int TotalNodes = 20;                     // Totoal Number of Nodes
+    [SerializeField] private float Height = 0f;                                     // z-value
 
-    private int totalGrid = 100;                                                   // 10 x 10
-    private List<GameObject> listNodes = new List<GameObject>();
-    private List<GameObject> listLines = new List<GameObject>();
+    private int totalGrid = 100;                                                    // 10 x 10
+    private List<GameObject> listNodes = new List<GameObject>();                    // List of Nodes
+    private List<GameObject> listLines = new List<GameObject>();                    // List of Lines
 
-    private Dictionary<int, Vector3> grid = new Dictionary<int, Vector3>();
-    private List<int> gridPos = new List<int>();
+    private Dictionary<int, Vector3> grid = new Dictionary<int, Vector3>();         // Grid for Nodes in order to avoid to touch each other
+    private List<int> gridPos = new List<int>();                                    // Random positions on Grid
 
-    private GameObject nodePrefab;
-    private GameObject linePrefab;
+    private GameObject nodePrefab;                                                  // Prefab for Node
+    private GameObject linePrefab;                                                  // Prefab for Line
 
-    void SetGrid()
+    // Initialoze Grids
+    void InitGrid()
     {
         int x = 0;
         int y = 0;
@@ -32,6 +33,7 @@ public class Main : MonoBehaviour
         }
     }
 
+    // Random positions for Nodes on the Grid
     void RandomPositionInGrid()
     {
         for(int i =0; i < TotalNodes;)
@@ -52,7 +54,9 @@ public class Main : MonoBehaviour
         gridPos.Sort();
     }
 
-    Vector3 FindClosestNode(List<Node> obj, Vector3 pos, bool withvisited = true)
+    // I try to use this function
+    // However, the one of nodes is not connecting to others.
+    Vector3 FindClosestNode(List<GameObject> obj, Vector3 pos)
     {
         float closestPos = 0f;
         float distance = 0f;
@@ -60,24 +64,14 @@ public class Main : MonoBehaviour
 
         closestPos = Vector3.Distance(pos, obj[0].transform.position);
 
-        for(int i = 1; i < obj.Count; i++)
+        for(int i = 0; i < obj.Count; i++)
         {
             distance = Vector3.Distance(pos, obj[i].transform.position);
-            if(distance < closestPos && pos != obj[i].transform.position)
+
+            if(distance < closestPos && pos != obj[i].transform.position && !obj[i].GetComponent<Node>().visited)
             {
-                if(withvisited)
-                {
-                    if(!obj[i].visited)
-                    {
-                        closestPos = distance;
-                        objIndex = i;
-                    }
-                }
-                else
-                {
-                    closestPos = distance;
-                    objIndex = i;
-                }
+                closestPos = distance;
+                objIndex = i;
             }
         }
 
@@ -86,24 +80,16 @@ public class Main : MonoBehaviour
 
     void Start()
     {
-        SetGrid();
+        InitGrid();
         RandomPositionInGrid();
 
+        // Load Prefabs from the Resource folder
         nodePrefab = Resources.Load<GameObject>("Node");
         linePrefab = Resources.Load<GameObject>("Line");
 
+        // Generated Nodes and lines
         GeneratedNode();
         GeneratedLine();
-
-/*        for (int i = 0; i < listNodes.Count; i++)
-        {
-            if(!listNodes[i].visited)
-            {
-                GameObject lastLine = Instantiate(linePrefab);
-                lastLine.GetComponent<Line>().startPos = listNodes[0].position;
-                lastLine.GetComponent<Line>().endPos = listNodes[1].position;
-            }
-        }*/
     }
 
     void GeneratedNode()
@@ -113,7 +99,7 @@ public class Main : MonoBehaviour
             Vector3 pos = grid[gridPos[i - 1]];
             var node = Instantiate(nodePrefab, pos, Quaternion.identity);
             node.GetComponent<Node>().visited = false;
-            listNodes.Add(node);
+            listNodes.Add(node);                                            // Adding into the list
         }
     }
 
@@ -121,14 +107,22 @@ public class Main : MonoBehaviour
     {
         for (int i = 0; i < TotalNodes - 1; i++)
         {
-            listLines.Add(Instantiate(linePrefab));
-            listLines[i].GetComponent<Line>().SetPoint(listNodes[i].transform.position, listNodes[i + 1].transform.position);
-            listNodes[i].GetComponent<Node>().visited = true;
+            listLines.Add(Instantiate(linePrefab));                         // Adding into the list
 
-            //            listLines[i].GetComponent<Line>().endPos = FindClosestNode(listNodes, listLines[i].GetComponent<Line>().startPos);
+            // Draw Line with the start point and the end point
+            listLines[i].GetComponent<Line>().SetPoint(listNodes[i].transform.position, listNodes[i + 1].transform.position);
+
+            // I try to use this function
+            // However, the one of nodes is not connecting to others.
+//            listLines[i].GetComponent<Line>().SetPoint(listNodes[i].transform.position,
+//                FindClosestNode(listNodes, listNodes[i].transform.position));
+
+            // Setting visited boolean value
+            listNodes[i].GetComponent<Node>().visited = true;
         }
     }
 
+    // New button clicked on UI
     public void NewButtonClicked()
     {
         foreach (GameObject obj in listNodes)

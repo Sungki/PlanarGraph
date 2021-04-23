@@ -4,13 +4,13 @@ using UnityEngine;
 
 [RequireComponent(typeof(LineRenderer))]
 public class Line : MonoBehaviour
-{
-    public Vector3 startPos;
-    public Vector3 endPos;
-    
+{    
     private LineRenderer render;
     private Vector3[] pos = new Vector3[2];
+    public Vector3 startPos;
+    public Vector3 endPos;
 
+    // Setting the start and the end points
     public void SetPoint(Vector3 start, Vector3 end)
     {
         startPos = start;
