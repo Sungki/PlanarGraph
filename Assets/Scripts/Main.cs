@@ -119,7 +119,7 @@ public class Main : MonoBehaviour
             listLines[i].GetComponent<Line>().startPos = listNodes[i].position;
             listNodes[i].visited = true;
             listLines[i].GetComponent<Line>().endPos = listNodes[i+1].position;
-
+              
 //            listLines[i].GetComponent<Line>().endPos = FindClosestNode(listNodes, listLines[i].GetComponent<Line>().startPos);
         }
 
