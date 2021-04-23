@@ -63,7 +63,7 @@ public class Main : MonoBehaviour
         gridPos.Sort();
     }
 
-    Vector3 FindClosestNode(List<Node> obj, Vector3 pos)
+    Vector3 FindClosestNode(List<Node> obj, Vector3 pos, bool withvisited = true)
     {
         float closestPos = 0f;
         float distance = 0f;
@@ -74,10 +74,21 @@ public class Main : MonoBehaviour
         for(int i = 1; i < obj.Count; i++)
         {
             distance = Vector3.Distance(pos, obj[i].position);
-            if(distance < closestPos && pos != obj[i].position && !obj[i].visited)
+            if(distance < closestPos && pos != obj[i].position)
             {
-                closestPos = distance;
-                objIndex = i;
+                if(withvisited)
+                {
+                    if(!obj[i].visited)
+                    {
+                        closestPos = distance;
+                        objIndex = i;
+                    }
+                }
+                else
+                {
+                    closestPos = distance;
+                    objIndex = i;
+                }
             }
         }
 
@@ -102,14 +113,25 @@ public class Main : MonoBehaviour
         }
 
         linePrefab = Resources.Load("Line") as GameObject;
-        for (int i = 0; i < TotalNodes - 1; i++)
+        for (int i = 0; i < TotalNodes -1; i++)
         {
             listLines.Add(Instantiate(linePrefab));
             listLines[i].GetComponent<Line>().startPos = listNodes[i].position;
             listNodes[i].visited = true;
-//            listLines[i].GetComponent<Line>().endPos = listNodes[i+1].position;
+            listLines[i].GetComponent<Line>().endPos = listNodes[i+1].position;
 
-            listLines[i].GetComponent<Line>().endPos = FindClosestNode(listNodes, listLines[i].GetComponent<Line>().startPos);
+//            listLines[i].GetComponent<Line>().endPos = FindClosestNode(listNodes, listLines[i].GetComponent<Line>().startPos);
         }
+
+/*        for (int i = 0; i < listNodes.Count; i++)
+        {
+            if(!listNodes[i].visited)
+            {
+                GameObject lastLine = Instantiate(linePrefab);
+                lastLine.GetComponent<Line>().startPos = listNodes[0].position;
+                lastLine.GetComponent<Line>().endPos = listNodes[1].position;
+            }
+        }*/
+
     }
 }
