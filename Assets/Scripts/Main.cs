@@ -85,7 +85,7 @@ public class Main : MonoBehaviour
         SetGrid();
         RandomPositionInGrid();
 
-        var nodePrefab = Resources.Load("Node") as GameObject;
+        var nodePrefab = Resources.Load<GameObject>("Node");
         for (int i = 1; i <= TotalNodes; i++)
         {
             Vector3 pos = grid[gridPos[i - 1]];
@@ -94,7 +94,7 @@ public class Main : MonoBehaviour
             listNodes.Add(node.GetComponent<Node>());
         }
 
-        var linePrefab = Resources.Load("Line") as GameObject;
+        var linePrefab = Resources.Load<GameObject>("Line");
         for (int i = 0; i < TotalNodes -1; i++)
         {
             var line = Instantiate(linePrefab);
