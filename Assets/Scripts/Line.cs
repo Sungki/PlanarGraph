@@ -11,7 +11,7 @@ public class Line : MonoBehaviour
     private LineRenderer render;
     private Vector3[] pos = new Vector3[2];
 
-    void SetPoint(Vector3 start, Vector3 end)
+    public void SetPoint(Vector3 start, Vector3 end)
     {
         startPos = start;
         endPos = end;

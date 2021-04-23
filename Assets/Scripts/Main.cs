@@ -8,22 +8,7 @@ public class Main : MonoBehaviour
     [SerializeField] private float Height = 0f;
 
     private int totalGrid = 100;                                                   // 10 x 10
-
-    private GameObject nodePrefab;
-    private GameObject linePrefab;
-
-    public class Node
-    {
-        public GameObject obj;
-        public Vector3 position;
-        public bool visited;
-    };
-
-    //    private List<GameObject> listNodes = new List<GameObject>();
-
     private List<Node> listNodes = new List<Node>();
-
-    private List<GameObject> listLines = new List<GameObject>();
 
     private Dictionary<int, Vector3> grid = new Dictionary<int, Vector3>();
     private List<int> gridPos = new List<int>();
@@ -69,12 +54,12 @@ public class Main : MonoBehaviour
         float distance = 0f;
         int objIndex = 0;
 
-        closestPos = Vector3.Distance(pos, obj[0].position);
+        closestPos = Vector3.Distance(pos, obj[0].transform.position);
 
         for(int i = 1; i < obj.Count; i++)
         {
-            distance = Vector3.Distance(pos, obj[i].position);
-            if(distance < closestPos && pos != obj[i].position)
+            distance = Vector3.Distance(pos, obj[i].transform.position);
+            if(distance < closestPos && pos != obj[i].transform.position)
             {
                 if(withvisited)
                 {
@@ -92,7 +77,7 @@ public class Main : MonoBehaviour
             }
         }
 
-        return obj[objIndex].position;
+        return obj[objIndex].transform.position;
     }
 
     void Start()
@@ -100,25 +85,21 @@ public class Main : MonoBehaviour
         SetGrid();
         RandomPositionInGrid();
 
-        nodePrefab = Resources.Load("Node") as GameObject;
+        var nodePrefab = Resources.Load("Node") as GameObject;
         for (int i = 1; i <= TotalNodes; i++)
         {
             Vector3 pos = grid[gridPos[i - 1]];
-
-            Node n = new Node();
-            n.obj = Instantiate(nodePrefab, pos, Quaternion.identity);
-            n.visited = false;
-            n.position = pos;
-            listNodes.Add(n);
+            var node = Instantiate(nodePrefab, pos, Quaternion.identity);
+            node.GetComponent<Node>().visited = false;
+            listNodes.Add(node.GetComponent<Node>());
         }
 
-        linePrefab = Resources.Load("Line") as GameObject;
+        var linePrefab = Resources.Load("Line") as GameObject;
         for (int i = 0; i < TotalNodes -1; i++)
         {
-            listLines.Add(Instantiate(linePrefab));
-            listLines[i].GetComponent<Line>().startPos = listNodes[i].position;
+            var line = Instantiate(linePrefab);
+            line.GetComponent<Line>().SetPoint(listNodes[i].transform.position, listNodes[i + 1].transform.position);
             listNodes[i].visited = true;
-            listLines[i].GetComponent<Line>().endPos = listNodes[i+1].position;
               
 //            listLines[i].GetComponent<Line>().endPos = FindClosestNode(listNodes, listLines[i].GetComponent<Line>().startPos);
         }
